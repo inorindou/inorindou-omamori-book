@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>おまもりBOOK 📖✨</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f8fafc;
+      color: #1a1a1a;
+    }
+    header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+    .btn-settings {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: #555555;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+    .btn-settings:hover {
+      background-color: #f1f5f9;
+      color: #1a1a1a;
+    }
+    h1 {
+      text-align: center;
+      color: #1a1a1a;
+      padding-bottom: 5px;
+      margin-bottom: 4px;
+    }
+    .sub-title {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    /* 新規登録エリア */
+    .form-container {
+      background: #ffffff;
+      margin-bottom: 28px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    .form-header {
+      padding: 16px 20px;
+      background: #ffffff;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      font-weight: bold;
+      font-size: 1.05rem;
+      color: #2563eb;
+      transition: background 0.2s ease;
+    }
+    .form-header:hover {
+      background: #eff6ff;
+    }
+    .form-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+      background: #ffffff;
+    }
+    .form-container.open .form-body {
+      max-height: 1000px;
+      transition: max-height 0.3s ease-in-out;
+    }
+    .form-content {
+      padding: 20px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .input-group {
+      margin-bottom: 16px;
+    }
+    .input-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .text-input {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-sizing: border-box;
+      outline: none;
+      font-family: inherit;
+    }
+    .text-input:focus, textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 0.95rem;
+      font-family: inherit;
+      resize: vertical;
+    }
+    .submit-area {
+      text-align: center;
+      margin-top: 16px;
+    }
+    .btn-submit {
+      background-color: #2563eb;
+      color: #ffffff;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: bold;
+      padding: 10px 28px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+      transition: all 0.2s ease;
+    }
+    .btn-submit:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    /* おまもり一覧エリア */
+    .book-section {
+      margin-top: 10px;
+    }
+    .book-section-title {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #334155;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    /* 【親】大カテゴリグループ */
+    .category-group {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      overflow: hidden;
+    }
+    .category-header {
+      padding: 14px 20px;
+      background: #f1f5f9;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      font-weight: bold;
+      font-size: 1.05rem;
+      color: #1e293b;
+    }
+    .category-header:hover {
+      background: #e2e8f0;
+    }
+    .category-title-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-grow: 1;
+    }
+    .category-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-icon-delete {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .btn-icon-delete:hover {
+      background: #fee2e2;
+    }
+    .category-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+      background: #f8fafc;
+    }
+    .category-group.open .category-body {
+      max-height: 3000px;
+      transition: max-height 0.3s ease-in-out;
+    }
+    .category-content {
+      padding: 12px 16px 16px 16px;
+    }
+    .empty-cat-notice {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      padding: 12px;
+    }
+
+    /* 【子】中カテゴリ（お守りカード） */
+    .omamori-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .omamori-header {
+      padding: 12px 16px;
+      background: #ffffff;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      font-weight: bold;
+      color: #2563eb;
+    }
+    .omamori-header:hover {
+      background: #eff6ff;
+    }
+    .arrow-icon {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      transition: transform 0.3s ease;
+    }
+    .category-group.open > .category-header .arrow-icon,
+    .omamori-card.open > .omamori-header .arrow-icon,
+    .form-container.open .arrow-icon {
+      transform: rotate(180deg);
+    }
+    .omamori-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+      background: #ffffff;
+    }
+    .omamori-card.open .omamori-body {
+      max-height: 1500px;
+      transition: max-height 0.3s ease-in-out;
+    }
+    .omamori-content {
+      padding: 16px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #334155;
+      white-space: pre-wrap;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 16px 12px 16px;
+    }
+    .btn-delete {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .btn-delete:hover {
+      color: #ef4444;
+      background: #fef2f2;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <button class="btn-settings" onclick="alert('設定機能は準備中です♪')">⚙️ 設定</button>
+  </header>
+
+  <h1>おまもりBOOK 📖✨</h1>
+  <div class="sub-title">〜自分の取扱説明書・ブレた時のマイFAQ〜</div>
+
+  <!-- 開閉式の追加フォーム -->
+  <div class="form-container" id="formContainer">
+    <div class="form-header" onclick="toggleForm()">
+      <span>＋ 新しいおまもりを追加する</span>
+      <span class="arrow-icon">▼</span>
+    </div>
+    <div class="form-body">
+      <div class="form-content">
+        <div class="input-group">
+          <label class="input-label" for="categoryInput">【大カテゴリ】こういうときに見る（シーン）</label>
+          <input type="text" id="categoryInput" class="text-input" placeholder="例：＜焦ってしまったときに見る＞">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="titleInput">【中カテゴリ】タイトル／合言葉</label>
+          <input type="text" id="titleInput" class="text-input" placeholder="例：時間を忘れる旅に出る／自分を取り戻す秘密">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="contentInput">【詳細本文】（行動指針・名言・体験談など）</label>
+          <textarea id="contentInput" placeholder="▶︎〜〜〜&#10;▶︎〜〜〜&#10;（※ずらーっと内容を書いてね♪）"></textarea>
+        </div>
+
+        <div class="submit-area">
+          <button class="btn-submit" onclick="addOmamori()">保存して追加する♪</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- お守りカード一覧表示エリア -->
+  <div class="book-section">
+    <div class="book-section-title">🛡️ あなたのおまもり一覧 🛡️</div>
+    <div id="omamoriList">
+      <!-- JavaScriptで動的生成されます -->
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY_ITEMS = 'omamori_book_items_v2';
+    const STORAGE_KEY_CATS = 'omamori_book_categories_v2';
+
+    // 初期データ
+    const DEFAULT_CATEGORIES = [
+      "＜人間関係に迷ったときに見る＞",
+      "＜noteの書く手が止まったときに見る＞",
+      "＜焦ってしまったときに見る＞"
+    ];
+
+    const DEFAULT_ITEMS = [
+      {
+        id: "1",
+        category: "＜人間関係に迷ったときに見る＞",
+        title: "▶︎ 相手の感情と自分の境界線を引く",
+        content: "・相手の機嫌は相手の問題。自分がコントロールできることだけに集中する。\n・迷った時は『自分はどうしたいか？』を主語にして考える。"
+      },
+      {
+        id: "2",
+        category: "＜noteの書く手が止まったときに見る＞",
+        title: "▶︎ 過去の文章が今を支え未来のエネルギーになる",
+        content: "・noteのメリット：過去の自分が書いた文章が今の自分を応援してくれて、未来（書きたいこと）が前に進むエネルギーをくれる！\n・上手く書こうとせず、今の素直な気付きを1行だけ書いてみる。"
+      },
+      {
+        id: "3",
+        category: "＜焦ってしまったときに見る＞",
+        title: "▶︎ 時間を忘れる旅にでる",
+        content: "・自分を取り戻し、人生を変えていく秘密の始まり。\n・一度深呼吸して、温かいお茶を一口飲む。"
+      }
+    ];
+
+    let categoriesData = [];
+    let omamoriData = [];
+
+    function loadData() {
+      const savedCats = localStorage.getItem(STORAGE_KEY_CATS);
+      const savedItems = localStorage.getItem(STORAGE_KEY_ITEMS);
+
+      if (savedCats) {
+        try { categoriesData = JSON.parse(savedCats); } catch (e) { categoriesData = [...DEFAULT_CATEGORIES]; }
+      } else {
+        categoriesData = [...DEFAULT_CATEGORIES];
+      }
+
+      if (savedItems) {
+        try { omamoriData = JSON.parse(savedItems); } catch (e) { omamoriData = [...DEFAULT_ITEMS]; }
+      } else {
+        omamoriData = [...DEFAULT_ITEMS];
+      }
+
+      saveData();
+      renderGroupedCards();
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY_CATS, JSON.stringify(categoriesData));
+      localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(omamoriData));
+    }
+
+    function toggleForm() {
+      document.getElementById('formContainer').classList.toggle('open');
+    }
+
+    // 画面レンダリング
+    function renderGroupedCards() {
+      const container = document.getElementById('omamoriList');
+      container.innerHTML = "";
+
+      if (categoriesData.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:30px;">大カテゴリがありません。「＋ 新しいおまもりを追加する」から追加してね♪</div>';
+        return;
+      }
+
+      categoriesData.forEach((catName, catIndex) => {
+        const catGroup = document.createElement('div');
+        catGroup.className = 'category-group';
+        catGroup.id = `catGroup_${catIndex}`;
+
+        // このカテゴリに属する中カテゴリ（お守り）を抽出
+        const items = omamoriData.filter(item => item.category === catName);
+
+        let itemsHtml = "";
+        if (items.length === 0) {
+          itemsHtml = '<div class="empty-cat-notice">（まだおまもりがありません）</div>';
+        } else {
+          itemsHtml = items.map((item, itemIdx) => `
+            <div class="omamori-card" id="card_${catIndex}_${itemIdx}">
+              <div class="omamori-header" onclick="toggleOmamoriCard('${catIndex}_${itemIdx}')">
+                <span>${escapeHtml(item.title)}</span>
+                <span class="arrow-icon">▼</span>
+              </div>
+              <div class="omamori-body">
+                <div class="omamori-content">${escapeHtml(item.content)}</div>
+                <div class="card-footer">
+                  <button class="btn-delete" onclick="deleteSingleOmamori('${item.id}', event)">🗑️ このおまもりを削除</button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        catGroup.innerHTML = `
+          <div class="category-header" onclick="toggleCategoryGroup(${catIndex})">
+            <div class="category-title-area">
+              <span>📁 ${escapeHtml(catName)} (${items.length})</span>
+            </div>
+            <div class="category-actions">
+              <button class="btn-icon-delete" title="大カテゴリごと削除" onclick="deleteCategoryGroup('${escapeHtml(catName)}', event)">🗑️</button>
+              <span class="arrow-icon">▼</span>
+            </div>
+          </div>
+          <div class="category-body">
+            <div class="category-content">
+              ${itemsHtml}
+            </div>
+          </div>
+        `;
+
+        container.appendChild(catGroup);
+      });
+    }
+
+    // 大カテゴリの開閉
+    function toggleCategoryGroup(catIdx) {
+      document.getElementById(`catGroup_${catIdx}`).classList.toggle('open');
+    }
+
+    // 中カテゴリ（カード）の開閉
+    function toggleOmamoriCard(idStr) {
+      document.getElementById(`card_${idStr}`).classList.toggle('open');
+    }
+
+    // おまもりの新規追加
+    function addOmamori() {
+      const category = document.getElementById('categoryInput').value.trim();
+      const title = document.getElementById('titleInput').value.trim();
+      const content = document.getElementById('contentInput').value.trim();
+
+      if (!title || !content) {
+        alert("タイトルと内容は入力してください♪");
+        return;
+      }
+
+      const targetCat = category || "＜その他のおまもり＞";
+
+      // 大カテゴリが存在しなければ新規作成リストに追加
+      if (!categoriesData.includes(targetCat)) {
+        categoriesData.push(targetCat);
+      }
+
+      // 「▶︎」を自動補正
+      let formattedTitle = title;
+      if (!formattedTitle.startsWith('▶︎') && !formattedTitle.startsWith('▶')) {
+        formattedTitle = '▶︎ ' + formattedTitle;
+      }
+
+      const newItem = {
+        id: "omamori_" + Date.now(),
+        category: targetCat,
+        title: formattedTitle,
+        content: content
+      };
+
+      omamoriData.unshift(newItem);
+      saveData();
+      renderGroupedCards();
+
+      // フォーム初期化
+      document.getElementById('categoryInput').value = "";
+      document.getElementById('titleInput').value = "";
+      document.getElementById('contentInput').value = "";
+      toggleForm();
+
+      // 追加先のカテゴリを開く
+      const catIndex = categoriesData.indexOf(targetCat);
+      if (catIndex !== -1) {
+        setTimeout(() => {
+          const groupEl = document.getElementById(`catGroup_${catIndex}`);
+          if (groupEl) groupEl.classList.add('open');
+        }, 100);
+      }
+    }
+
+    // 中カテゴリ（個別の1件）を削除しても、大カテゴリ枠は消えずに残る！
+    function deleteSingleOmamori(id, event) {
+      event.stopPropagation();
+      if (confirm("このおまもりを削除してもよろしいですか？")) {
+        omamoriData = omamoriData.filter(item => item.id !== id);
+        saveData();
+        renderGroupedCards();
+      }
+    }
+
+    // 大カテゴリ自体の右側にあるゴミ箱アイコンを押した時だけ一括削除！
+    function deleteCategoryGroup(catName, event) {
+      event.stopPropagation();
+      if (confirm(`大カテゴリ「${catName}」と、その中身をすべて削除してもよろしいですか？`)) {
+        // 大カテゴリリストから削除
+        categoriesData = categoriesData.filter(cat => cat !== catName);
+        // 中身もあわせて削除
+        omamoriData = omamoriData.filter(item => item.category !== catName);
+        saveData();
+        renderGroupedCards();
+      }
+    }
+
+    function escapeHtml(str) {
+      return (str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadData();
+    });
+  </script>
+</body>
+</html>
