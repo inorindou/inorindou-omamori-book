@@ -118,7 +118,7 @@
       overflow: hidden;
     }
     .editor-toolbar {
-      background-color: #f8fafc;
+      background-color: #ffffff; /* テキスト箇所と同じ白色に変更 */
       border-bottom: 1px solid #cbd5e1;
       padding: 6px 10px;
       display: flex;
@@ -348,7 +348,7 @@
     <button class="btn-settings" onclick="alert('設定機能は準備中です♪')">⚙️ 設定</button>
   </header>
 
-  <h1>📖おまもりBOOK（おまもりの書）📖</h1>
+  <h1>📖おまもりBOOK／おまもりの書）📖</h1>
   <div class="sub-title">〜自分の取扱説明書・ブレた時のマイFAQ〜</div>
 
   <div class="form-container" id="formContainer">
@@ -375,7 +375,7 @@
             <div class="editor-toolbar">
               <button type="button" class="toolbar-btn" onclick="addLinkToSelection()">🔗 リンクにする</button>
               <button type="button" class="toolbar-btn" onclick="removeLinkFromSelection()">❌ リンク解除</button>
-              <span class="toolbar-tip">💡文字を選択して「🔗 リンクにする」を押してね！</span>
+              <span class="toolbar-tip">💡リンク化したい箇所は文字を選択して「🔗 リンクにする」を押してね！</span>
             </div>
             <div id="contentEditor" class="rich-editor" contenteditable="true" placeholder="▶︎ ここに文章を入力してね♪&#10;▶︎ リンクにしたい文字を選択して、上の「🔗 リンクにする」を押すとURLが埋め込めます！"></div>
           </div>
