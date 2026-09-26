@@ -11,7 +11,7 @@
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
-      background-color: #f8fafc;
+      background-color: #ffffff; /* ★メディテーションに合わせて白ベースに */
       color: #1a1a1a;
     }
     header {
@@ -67,11 +67,11 @@
       user-select: none;
       font-weight: bold;
       font-size: 1.05rem;
-      color: #2563eb;
+      color: #1a1a1a;
       transition: background 0.2s ease;
     }
     .form-header:hover {
-      background: #eff6ff;
+      background: #f1f5f9;
     }
     .form-body {
       max-height: 0;
@@ -85,7 +85,7 @@
     }
     .form-content {
       padding: 20px;
-      border-top: 1px solid #f1f5f9;
+      border-top: 1px solid #e2e8f0;
     }
     .input-group {
       margin-bottom: 16px;
@@ -94,7 +94,7 @@
       display: block;
       font-size: 0.9rem;
       font-weight: bold;
-      color: #334155;
+      color: #1a1a1a;
       margin-bottom: 6px;
     }
     .text-input {
@@ -106,6 +106,7 @@
       box-sizing: border-box;
       outline: none;
       font-family: inherit;
+      color: #1a1a1a;
     }
     .text-input:focus, textarea:focus {
       border-color: #3b82f6;
@@ -121,25 +122,27 @@
       font-size: 0.95rem;
       font-family: inherit;
       resize: vertical;
+      color: #1a1a1a;
     }
     .submit-area {
       text-align: center;
-      margin-top: 16px;
+      margin-top: 20px;
     }
+    /* ★保存ボタンをメディテーション側の統一スタイルに変更！ */
     .btn-submit {
-      background-color: #2563eb;
-      color: #ffffff;
-      border: none;
-      font-size: 0.95rem;
+      background-color: #ffffff;
+      color: #1a1a1a;
+      border: 1px solid #cbd5e1;
+      font-size: 1rem;
       font-weight: bold;
-      padding: 10px 28px;
+      padding: 12px 36px;
       border-radius: 30px;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
       transition: all 0.2s ease;
     }
     .btn-submit:hover {
-      background-color: #1d4ed8;
+      background-color: #e2e8f0;
       transform: translateY(-1px);
     }
 
@@ -150,7 +153,7 @@
     .book-section-title {
       font-size: 1.15rem;
       font-weight: bold;
-      color: #334155;
+      color: #1a1a1a;
       margin-bottom: 16px;
       text-align: center;
     }
@@ -158,15 +161,15 @@
     /* 【親】大カテゴリグループ */
     .category-group {
       background: #ffffff;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #e2e8f0;
       border-radius: 12px;
       margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
       overflow: hidden;
     }
     .category-header {
-      padding: 14px 20px;
-      background: #f1f5f9;
+      padding: 16px 20px;
+      background: #ffffff;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
@@ -174,10 +177,11 @@
       user-select: none;
       font-weight: bold;
       font-size: 1.05rem;
-      color: #1e293b;
+      color: #1a1a1a;
+      transition: background 0.2s ease;
     }
     .category-header:hover {
-      background: #e2e8f0;
+      background: #f1f5f9;
     }
     .category-title-area {
       display: flex;
@@ -194,32 +198,35 @@
       background: transparent;
       border: none;
       cursor: pointer;
-      font-size: 1rem;
-      padding: 4px 6px;
-      border-radius: 4px;
-      transition: background 0.2s;
+      font-size: 0.9rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: #1a1a1a;
+      transition: background 0.2s ease, color 0.2s ease;
     }
     .btn-icon-delete:hover {
-      background: #fee2e2;
+      background: #f1f5f9;
+      color: #000000;
     }
     .category-body {
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
-      background: #f8fafc;
+      background: #ffffff;
     }
     .category-group.open .category-body {
       max-height: 3000px;
       transition: max-height 0.3s ease-in-out;
     }
     .category-content {
-      padding: 12px 16px 16px 16px;
+      padding: 8px 16px 16px 16px;
+      border-top: 1px dashed #e2e8f0;
     }
     .empty-cat-notice {
       text-align: center;
       color: #94a3b8;
       font-size: 0.85rem;
-      padding: 12px;
+      padding: 16px;
     }
 
     /* 【子】中カテゴリ（お守りカード） */
@@ -227,8 +234,9 @@
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
-      margin-top: 8px;
+      margin-top: 10px;
       overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
     .omamori-header {
       padding: 12px 16px;
@@ -239,14 +247,15 @@
       align-items: center;
       user-select: none;
       font-weight: bold;
-      color: #2563eb;
+      color: #1a1a1a;
+      transition: background 0.2s ease;
     }
     .omamori-header:hover {
-      background: #eff6ff;
+      background: #f8fafc;
     }
     .arrow-icon {
       font-size: 0.8rem;
-      color: #94a3b8;
+      color: #64748b;
       transition: transform 0.3s ease;
     }
     .category-group.open > .category-header .arrow-icon,
@@ -266,7 +275,7 @@
     }
     .omamori-content {
       padding: 16px;
-      border-top: 1px solid #f1f5f9;
+      border-top: 1px dashed #e2e8f0;
       font-size: 0.95rem;
       line-height: 1.7;
       color: #334155;
@@ -280,15 +289,16 @@
     .btn-delete {
       background: transparent;
       border: none;
-      color: #94a3b8;
+      color: #1a1a1a;
       font-size: 0.8rem;
       cursor: pointer;
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: 6px;
+      transition: background 0.2s ease, color 0.2s ease;
     }
     .btn-delete:hover {
-      color: #ef4444;
-      background: #fef2f2;
+      background: #f1f5f9;
+      color: #000000;
     }
   </style>
 </head>
@@ -326,7 +336,7 @@
         </div>
 
         <div class="submit-area">
-          <button class="btn-submit" onclick="addOmamori()">保存して追加する♪</button>
+          <button class="btn-submit" onclick="addOmamori()">＋ 保存して追加する♪</button>
         </div>
       </div>
     </div>
@@ -448,7 +458,7 @@
               <span>📁 ${escapeHtml(catName)} (${items.length})</span>
             </div>
             <div class="category-actions">
-              <button class="btn-icon-delete" title="大カテゴリごと削除" onclick="deleteCategoryByIndex(${catIndex}, event)">🗑️</button>
+              <button class="btn-icon-delete" title="大カテゴリごと削除" onclick="deleteCategoryByIndex(${catIndex}, event)">🗑️ 削除</button>
               <span class="arrow-icon">▼</span>
             </div>
           </div>
@@ -474,7 +484,7 @@
       }
     }
 
-    // 大カテゴリの開閉（※追加された安全な関数）
+    // 大カテゴリの開閉
     function toggleCategoryGroup(catIdx) {
       const groupEl = document.getElementById(`catGroup_${catIdx}`);
       if (groupEl) groupEl.classList.toggle('open');
@@ -547,7 +557,7 @@
       }
     }
 
-    // 大カテゴリをインデックス指定で安全に削除！（※エラー修正箇所）
+    // 大カテゴリをインデックス指定で削除
     function deleteCategoryByIndex(catIndex, event) {
       event.stopPropagation();
       const catName = categoriesData[catIndex];
