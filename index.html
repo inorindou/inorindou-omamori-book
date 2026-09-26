@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>おまもりBOOK 📖✨</title>
+  <title>📖おまもりBOOK（おまもりの書）📖</title>
   <style>
     body {
       font-family: system-ui, -apple-system, sans-serif;
@@ -299,7 +299,7 @@
     <button class="btn-settings" onclick="alert('設定機能は準備中です♪')">⚙️ 設定</button>
   </header>
 
-  <h1>おまもりBOOK 📖✨</h1>
+  <h1>📖おまもりBOOK（おまもりの書）📖</h1>
   <div class="sub-title">〜自分の取扱説明書・ブレた時のマイFAQ〜</div>
 
   <!-- 開閉式の追加フォーム -->
@@ -312,9 +312,9 @@
       <div class="form-content">
         <div class="input-group">
           <label class="input-label" for="categoryInput">【大カテゴリ】こういうときに見る（シーン）</label>
-          <input type="text" id="categoryInput" class="text-input" placeholder="例：＜焦ってしまったときに見る＞">
+          <input type="text" id="categoryInput" class="text-input" list="categoryOptions" placeholder="選ぶか、新しいシーンを入力してね♪">
+          <datalist id="categoryOptions"></datalist>
         </div>
-
         <div class="input-group">
           <label class="input-label" for="titleInput">【中カテゴリ】タイトル／合言葉</label>
           <input type="text" id="titleInput" class="text-input" placeholder="例：時間を忘れる旅に出る／自分を取り戻す秘密">
@@ -341,8 +341,8 @@
   </div>
 
   <script>
-    const STORAGE_KEY_ITEMS = 'omamori_book_items_v2';
-    const STORAGE_KEY_CATS = 'omamori_book_categories_v2';
+    const STORAGE_KEY_ITEMS = 'omamori_book_items_v3';
+    const STORAGE_KEY_CATS = 'omamori_book_categories_v3';
 
     // 初期データ
     const DEFAULT_CATEGORIES = [
@@ -448,7 +448,7 @@
               <span>📁 ${escapeHtml(catName)} (${items.length})</span>
             </div>
             <div class="category-actions">
-              <button class="btn-icon-delete" title="大カテゴリごと削除" onclick="deleteCategoryGroup('${escapeHtml(catName)}', event)">🗑️</button>
+              <button class="btn-icon-delete" title="大カテゴリごと削除" onclick="deleteCategoryByIndex(${catIndex}, event)">🗑️</button>
               <span class="arrow-icon">▼</span>
             </div>
           </div>
@@ -461,16 +461,29 @@
 
         container.appendChild(catGroup);
       });
+
+      // プルダウン（datalist）の中身を最新の大カテゴリ一覧で更新する
+      const datalist = document.getElementById('categoryOptions');
+      if (datalist) {
+        datalist.innerHTML = "";
+        categoriesData.forEach(catName => {
+          const option = document.createElement('option');
+          option.value = catName;
+          datalist.appendChild(option);
+        });
+      }
     }
 
-    // 大カテゴリの開閉
+    // 大カテゴリの開閉（※追加された安全な関数）
     function toggleCategoryGroup(catIdx) {
-      document.getElementById(`catGroup_${catIdx}`).classList.toggle('open');
+      const groupEl = document.getElementById(`catGroup_${catIdx}`);
+      if (groupEl) groupEl.classList.toggle('open');
     }
 
     // 中カテゴリ（カード）の開閉
     function toggleOmamoriCard(idStr) {
-      document.getElementById(`card_${idStr}`).classList.toggle('open');
+      const cardEl = document.getElementById(`card_${idStr}`);
+      if (cardEl) cardEl.classList.toggle('open');
     }
 
     // おまもりの新規追加
@@ -524,7 +537,7 @@
       }
     }
 
-    // 中カテゴリ（個別の1件）を削除しても、大カテゴリ枠は消えずに残る！
+    // 中カテゴリ（個別の1件）を削除
     function deleteSingleOmamori(id, event) {
       event.stopPropagation();
       if (confirm("このおまもりを削除してもよろしいですか？")) {
@@ -534,13 +547,14 @@
       }
     }
 
-    // 大カテゴリ自体の右側にあるゴミ箱アイコンを押した時だけ一括削除！
-    function deleteCategoryGroup(catName, event) {
+    // 大カテゴリをインデックス指定で安全に削除！（※エラー修正箇所）
+    function deleteCategoryByIndex(catIndex, event) {
       event.stopPropagation();
+      const catName = categoriesData[catIndex];
+      if (!catName) return;
+
       if (confirm(`大カテゴリ「${catName}」と、その中身をすべて削除してもよろしいですか？`)) {
-        // 大カテゴリリストから削除
-        categoriesData = categoriesData.filter(cat => cat !== catName);
-        // 中身もあわせて削除
+        categoriesData.splice(catIndex, 1);
         omamoriData = omamoriData.filter(item => item.category !== catName);
         saveData();
         renderGroupedCards();
