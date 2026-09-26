@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📖おまもりBOOK（note風リンク入力対応版）📖</title>
+  <title>📖おまもりBOOK（note風リンク＆太字入力対応版）📖</title>
   <style>
     body {
       font-family: system-ui, -apple-system, sans-serif;
@@ -118,7 +118,7 @@
       overflow: hidden;
     }
     .editor-toolbar {
-      background-color: #ffffff; /* テキスト箇所と同じ白色に変更 */
+      background-color: #ffffff;
       border-bottom: 1px solid #cbd5e1;
       padding: 6px 10px;
       display: flex;
@@ -373,11 +373,12 @@
           <label class="input-label">【詳細本文】（行動指針・名言・体験談など）</label>
           <div class="editor-wrapper">
             <div class="editor-toolbar">
+              <button type="button" class="toolbar-btn" onclick="toggleBold()"><b>B</b> 太字</button>
               <button type="button" class="toolbar-btn" onclick="addLinkToSelection()">🔗 リンクにする</button>
               <button type="button" class="toolbar-btn" onclick="removeLinkFromSelection()">❌ リンク解除</button>
-              <span class="toolbar-tip">💡リンク化したい箇所は文字を選択して「🔗 リンクにする」を押してね！</span>
+              <span class="toolbar-tip">💡文字を選択して「太字」や「🔗 リンク」を押してね！</span>
             </div>
-            <div id="contentEditor" class="rich-editor" contenteditable="true" placeholder="▶︎ ここに文章を入力してね♪&#10;▶︎ リンクにしたい文字を選択して、上の「🔗 リンクにする」を押すとURLが埋め込めます！"></div>
+            <div id="contentEditor" class="rich-editor" contenteditable="true" placeholder="▶︎ ここに文章を入力してね♪&#10;▶︎ 文字を選択して「太字」や「🔗 リンクにする」を押すと装飾できます！"></div>
           </div>
         </div>
 
@@ -413,6 +414,11 @@
 
     let categoriesData = [];
     let omamoriData = [];
+
+    // ★ 選択した文字を太字にする関数 ★
+    function toggleBold() {
+      document.execCommand('bold', false, null);
+    }
 
     // ★ 選択した文字をリンク化する関数（note風機能） ★
     function addLinkToSelection() {
