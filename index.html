@@ -111,7 +111,7 @@
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
     
-    /* ★ note風ツールバーと入力領域のスタイル★ */
+    /* note風ツールバーと入力領域のスタイル */
     .editor-wrapper {
       border: 1px solid #cbd5e1;
       border-radius: 8px;
@@ -288,6 +288,34 @@
     .omamori-header:hover {
       background: #f8fafc;
     }
+    
+    /* ★ 並べ替えボタン用シンプルスタイル ★ */
+    .card-move-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-left: auto;
+      margin-right: 10px;
+    }
+    .btn-move {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #64748b;
+      transition: background 0.2s ease;
+    }
+    .btn-move:hover {
+      background: #e2e8f0;
+      color: #1a1a1a;
+    }
+    .btn-move:disabled {
+      opacity: 0.2;
+      cursor: default;
+    }
+
     .arrow-icon {
       font-size: 0.8rem;
       color: #64748b;
@@ -368,7 +396,6 @@
           <input type="text" id="titleInput" class="text-input" placeholder="例：時間を忘れる旅に出る／自分を取り戻す秘密">
         </div>
 
-        <!-- ★ note風の入力エリア ★ -->
         <div class="input-group">
           <label class="input-label">【詳細本文】（行動指針・名言・体験談など）</label>
           <div class="editor-wrapper">
@@ -415,12 +442,10 @@
     let categoriesData = [];
     let omamoriData = [];
 
-    // ★ 選択した文字を太字にする関数 ★
     function toggleBold() {
       document.execCommand('bold', false, null);
     }
 
-    // ★ 選択した文字をリンク化する関数（note風機能） ★
     function addLinkToSelection() {
       const selection = window.getSelection();
       if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
@@ -435,10 +460,8 @@
           validUrl = 'https://' + validUrl;
         }
         
-        // 選択された文字だけをリンク（aタグ）にする
         document.execCommand('createLink', false, validUrl);
         
-        // リンクに target="_blank" を付与して別タブで開くように設定
         const focusNode = selection.focusNode;
         if (focusNode) {
           const parentA = focusNode.parentElement.closest('a');
@@ -453,7 +476,6 @@
       }
     }
 
-    // ★ リンクを解除する関数 ★
     function removeLinkFromSelection() {
       document.execCommand('unlink', false, null);
     }
@@ -507,20 +529,32 @@
         if (items.length === 0) {
           itemsHtml = '<div class="empty-cat-notice">（まだおまもりがありません）</div>';
         } else {
-          itemsHtml = items.map((item, itemIdx) => `
-            <div class="omamori-card" id="card_${catIndex}_${itemIdx}">
-              <div class="omamori-header" onclick="toggleOmamoriCard('${catIndex}_${itemIdx}')">
-                <span>${escapeHtml(item.title)}</span>
-                <span class="arrow-icon">▼</span>
-              </div>
-              <div class="omamori-body">
-                <div class="omamori-content">${item.content}</div>
-                <div class="card-footer">
-                  <button class="btn-delete" onclick="deleteSingleOmamori('${item.id}', event)">🗑️ このおまもりを削除</button>
+          itemsHtml = items.map((item, itemIdx) => {
+            const isFirst = itemIdx === 0;
+            const isLast = itemIdx === items.length - 1;
+
+            return `
+              <div class="omamori-card" id="card_${catIndex}_${itemIdx}">
+                <div class="omamori-header" onclick="toggleOmamoriCard('${catIndex}_${itemIdx}')">
+                  <span>${escapeHtml(item.title)}</span>
+                  
+                  <!-- ★ 上下並べ替えボタン ★ -->
+                  <div class="card-move-actions" onclick="event.stopPropagation()">
+                    <button class="btn-move" title="上へ移動" onclick="moveOmamori(${catIndex}, ${itemIdx}, -1, event)" ${isFirst ? 'disabled' : ''}>⬆️</button>
+                    <button class="btn-move" title="下へ移動" onclick="moveOmamori(${catIndex}, ${itemIdx}, 1, event)" ${isLast ? 'disabled' : ''}>⬇️</button>
+                  </div>
+
+                  <span class="arrow-icon">▼</span>
+                </div>
+                <div class="omamori-body">
+                  <div class="omamori-content">${item.content}</div>
+                  <div class="card-footer">
+                    <button class="btn-delete" onclick="deleteSingleOmamori('${item.id}', event)">🗑️ このおまもりを削除</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          `).join('');
+            `;
+          }).join('');
         }
 
         catGroup.innerHTML = `
@@ -551,6 +585,39 @@
           option.value = catName;
           datalist.appendChild(option);
         });
+      }
+    }
+
+    // ★ 中カテゴリ（カード）を上下に移動する処理 ★
+    function moveOmamori(catIndex, itemIdx, direction, event) {
+      event.stopPropagation();
+      const catName = categoriesData[catIndex];
+      
+      // 同じ大カテゴリに属する全アイテムを取得
+      const categoryItems = omamoriData.filter(item => item.category === catName);
+      
+      const targetIdx = itemIdx + direction;
+      if (targetIdx < 0 || targetIdx >= categoryItems.length) return;
+
+      // 移動元と移動先の要素を取得
+      const itemToMove = categoryItems[itemIdx];
+      const targetItem = categoryItems[targetIdx];
+
+      // 全体配列(omamoriData)内のインデックスを検索して入れ替え
+      const mainIndex1 = omamoriData.indexOf(itemToMove);
+      const mainIndex2 = omamoriData.indexOf(targetItem);
+
+      if (mainIndex1 !== -1 && mainIndex2 !== -1) {
+        const temp = omamoriData[mainIndex1];
+        omamoriData[mainIndex1] = omamoriData[mainIndex2];
+        omamoriData[mainIndex2] = temp;
+
+        saveData();
+        renderGroupedCards();
+
+        // 並べ替え後もその大カテゴリを開いた状態に保つ
+        const groupEl = document.getElementById(`catGroup_${catIndex}`);
+        if (groupEl) groupEl.classList.add('open');
       }
     }
 
