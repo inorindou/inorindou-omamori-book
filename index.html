@@ -229,7 +229,7 @@
     .category-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
     .btn-icon-delete {
       background: transparent;
@@ -289,7 +289,7 @@
       background: #f8fafc;
     }
     
-    /* ★ 並べ替えボタン用シンプルスタイル ★ */
+    /* 並べ替えボタン用シンプルスタイル */
     .card-move-actions {
       display: flex;
       align-items: center;
@@ -523,6 +523,9 @@
         catGroup.className = 'category-group';
         catGroup.id = `catGroup_${catIndex}`;
 
+        const isFirstCat = catIndex === 0;
+        const isLastCat = catIndex === categoriesData.length - 1;
+
         const items = omamoriData.filter(item => item.category === catName);
 
         let itemsHtml = "";
@@ -538,7 +541,7 @@
                 <div class="omamori-header" onclick="toggleOmamoriCard('${catIndex}_${itemIdx}')">
                   <span>${escapeHtml(item.title)}</span>
                   
-                  <!-- ★ 上下並べ替えボタン ★ -->
+                  <!-- 中カテゴリ（おまもり）の上下並べ替えボタン -->
                   <div class="card-move-actions" onclick="event.stopPropagation()">
                     <button class="btn-move" title="上へ移動" onclick="moveOmamori(${catIndex}, ${itemIdx}, -1, event)" ${isFirst ? 'disabled' : ''}>⬆️</button>
                     <button class="btn-move" title="下へ移動" onclick="moveOmamori(${catIndex}, ${itemIdx}, 1, event)" ${isLast ? 'disabled' : ''}>⬇️</button>
@@ -563,6 +566,11 @@
               <span>📁 ${escapeHtml(catName)} (${items.length})</span>
             </div>
             <div class="category-actions">
+              <!-- ★ 大カテゴリの上下並べ替えボタン ★ -->
+              <div class="card-move-actions" onclick="event.stopPropagation()">
+                <button class="btn-move" title="大カテゴリを上へ" onclick="moveCategory(${catIndex}, -1, event)" ${isFirstCat ? 'disabled' : ''}>⬆️</button>
+                <button class="btn-move" title="大カテゴリを下へ" onclick="moveCategory(${catIndex}, 1, event)" ${isLastCat ? 'disabled' : ''}>⬇️</button>
+              </div>
               <button class="btn-icon-delete" title="大カテゴリごと削除" onclick="deleteCategoryByIndex(${catIndex}, event)">🗑️ 削除</button>
               <span class="arrow-icon">▼</span>
             </div>
@@ -588,22 +596,39 @@
       }
     }
 
+    // ★ 大カテゴリを上下に移動する処理 ★
+    function moveCategory(catIndex, direction, event) {
+      event.stopPropagation();
+      const targetIndex = catIndex + direction;
+
+      if (targetIndex < 0 || targetIndex >= categoriesData.length) return;
+
+      // 配列の要素を入れ替え
+      const temp = categoriesData[catIndex];
+      categoriesData[catIndex] = categoriesData[targetIndex];
+      categoriesData[targetIndex] = temp;
+
+      saveData();
+      renderGroupedCards();
+
+      // 移動後もその大カテゴリを開いた状態にする
+      const groupEl = document.getElementById(`catGroup_${targetIndex}`);
+      if (groupEl) groupEl.classList.add('open');
+    }
+
     // ★ 中カテゴリ（カード）を上下に移動する処理 ★
     function moveOmamori(catIndex, itemIdx, direction, event) {
       event.stopPropagation();
       const catName = categoriesData[catIndex];
       
-      // 同じ大カテゴリに属する全アイテムを取得
       const categoryItems = omamoriData.filter(item => item.category === catName);
       
       const targetIdx = itemIdx + direction;
       if (targetIdx < 0 || targetIdx >= categoryItems.length) return;
 
-      // 移動元と移動先の要素を取得
       const itemToMove = categoryItems[itemIdx];
       const targetItem = categoryItems[targetIdx];
 
-      // 全体配列(omamoriData)内のインデックスを検索して入れ替え
       const mainIndex1 = omamoriData.indexOf(itemToMove);
       const mainIndex2 = omamoriData.indexOf(targetItem);
 
@@ -615,7 +640,6 @@
         saveData();
         renderGroupedCards();
 
-        // 並べ替え後もその大カテゴリを開いた状態に保つ
         const groupEl = document.getElementById(`catGroup_${catIndex}`);
         if (groupEl) groupEl.classList.add('open');
       }
