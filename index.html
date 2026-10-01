@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📖おまもりBOOK（note風リンク＆太字入力対応版）📖</title>
+  <title>📖おまもりBOOK（スプシ連携版）📖</title>
   <style>
     body {
       font-family: system-ui, -apple-system, sans-serif;
@@ -18,8 +18,9 @@
       display: flex;
       justify-content: flex-end;
       margin-bottom: 10px;
+      gap: 8px;
     }
-    .btn-settings {
+    .btn-settings, .btn-sync {
       background-color: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 20px;
@@ -31,7 +32,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       transition: all 0.2s ease;
     }
-    .btn-settings:hover {
+    .btn-settings:hover, .btn-sync:hover {
       background-color: #f1f5f9;
       color: #1a1a1a;
     }
@@ -111,7 +112,6 @@
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
     
-    /* note風ツールバーと入力領域のスタイル */
     .editor-wrapper {
       border: 1px solid #cbd5e1;
       border-radius: 8px;
@@ -289,7 +289,6 @@
       background: #f8fafc;
     }
     
-    /* 並べ替えボタン用シンプルスタイル */
     .card-move-actions {
       display: flex;
       align-items: center;
@@ -373,7 +372,8 @@
 <body>
 
   <header>
-    <button class="btn-settings" onclick="alert('設定機能は準備中です♪')">⚙️GAS設定</button>
+    <button class="btn-sync" onclick="loadDataFromGas()" id="syncBtn">🔄 同期する</button>
+    <button class="btn-settings" onclick="openSettings()">⚙️GAS設定</button>
   </header>
 
   <h1>おまもりBOOK／おまもりの書</h1>
@@ -422,25 +422,21 @@
   </div>
 
   <script>
-    const STORAGE_KEY_ITEMS = 'omamori_book_items_v4';
-    const STORAGE_KEY_CATS = 'omamori_book_categories_v4';
-
-    const DEFAULT_CATEGORIES = [
+    const STORAGE_KEY_GAS_URL = 'omamori_book_gas_url_v1';
+    
+    // 初期データ（スプシ未接続時のバックアップ用）
+    let categoriesData = [
       "＜人間関係に迷ったときに見る＞",
       "＜noteの書く手が止まったときに見る＞"
     ];
-
-    const DEFAULT_ITEMS = [
+    let omamoriData = [
       {
         id: "1",
         category: "＜noteの書く手が止まったときに見る＞",
-        title: "▶︎ 過去の文章が今を支え未来のエネルギーになる",
+        title: "▶︎︎ 過去の文章が今を支え未来のエネルギーになる",
         content: "・noteのメリット：過去の自分が書いた文章が今の自分を応援してくれる！<br>・参考記事：<a href=\"https://note.com/inorindou\" target=\"_blank\">いのりんどうのnote</a>を見に行く<br>・上手く書こうとせず、今の素直な気付きを1行だけ書いてみる。"
       }
     ];
-
-    let categoriesData = [];
-    let omamoriData = [];
 
     function toggleBold() {
       document.execCommand('bold', false, null);
@@ -480,29 +476,81 @@
       document.execCommand('unlink', false, null);
     }
 
-    function loadData() {
-      const savedCats = localStorage.getItem(STORAGE_KEY_CATS);
-      const savedItems = localStorage.getItem(STORAGE_KEY_ITEMS);
-
-      if (savedCats) {
-        try { categoriesData = JSON.parse(savedCats); } catch (e) { categoriesData = [...DEFAULT_CATEGORIES]; }
-      } else {
-        categoriesData = [...DEFAULT_CATEGORIES];
+    // ⚙️ GAS設定（URLの登録）
+    function openSettings() {
+      const currentUrl = localStorage.getItem(STORAGE_KEY_GAS_URL) || "";
+      const newUrl = prompt("Google Apps Script (GAS) の「ウェブアプリのURL」を入力してください♪\n\n（未入力のままだとブラウザ内のみの保存になります）", currentUrl);
+      
+      if (newUrl !== null) {
+        localStorage.setItem(STORAGE_KEY_GAS_URL, newUrl.trim());
+        alert("GAS設定を保存しました♪ 「🔄 同期する」ボタンからスプシのデータを読み込んでね！");
+        if (newUrl.trim() !== "") {
+          loadDataFromGas();
+        }
       }
-
-      if (savedItems) {
-        try { omamoriData = JSON.parse(savedItems); } catch (e) { omamoriData = [...DEFAULT_ITEMS]; }
-      } else {
-        omamoriData = [...DEFAULT_ITEMS];
-      }
-
-      saveData();
-      renderGroupedCards();
     }
 
-    function saveData() {
-      localStorage.setItem(STORAGE_KEY_CATS, JSON.stringify(categoriesData));
-      localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(omamoriData));
+    // 🔄 スプシからデータを読み込む
+    function loadDataFromGas() {
+      const gasUrl = localStorage.getItem(STORAGE_KEY_GAS_URL);
+      if (!gasUrl) {
+        alert("先に右上の「⚙️GAS設定」からURLを登録してくださいね♪");
+        openSettings();
+        return;
+      }
+
+      const syncBtn = document.getElementById('syncBtn');
+      syncBtn.textContent = "⏳ 読み込み中...";
+
+      fetch(gasUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.categories && data.items) {
+            categoriesData = data.categories;
+            omamoriData = data.items;
+            renderGroupedCards();
+            alert("スプシからデータをばっちり読み込みました〜♪✨");
+          } else {
+            alert("データの取得に失敗しました。GASのコードを確認してね！");
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          alert("通信エラーが発生しました。URLやデプロイ設定を確認してね！");
+        })
+        .finally(() => {
+          syncBtn.textContent = "🔄 同期する";
+        });
+    }
+
+    // ☁️ スプシへデータを自動保存（送信）する
+    function saveDataToGas() {
+      const gasUrl = localStorage.getItem(STORAGE_KEY_GAS_URL);
+      if (!gasUrl) return; // URLが未設定ならローカル保持のみ
+
+      const payload = {
+        action: "saveAll",
+        categories: categoriesData,
+        items: omamoriData
+      };
+
+      fetch(gasUrl, {
+        method: "POST",
+        mode: "no-cors", // GASのCORS制限回避
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      }).catch(err => console.error("GAS保存エラー:", err));
+    }
+
+    function loadData() {
+      const gasUrl = localStorage.getItem(STORAGE_KEY_GAS_URL);
+      if (gasUrl) {
+        loadDataFromGas();
+      } else {
+        renderGroupedCards();
+      }
     }
 
     function toggleForm() {
@@ -541,7 +589,6 @@
                 <div class="omamori-header" onclick="toggleOmamoriCard('${catIndex}_${itemIdx}')">
                   <span>${escapeHtml(item.title)}</span>
                   
-                  <!-- 中カテゴリ（おまもり）の上下並べ替えボタン -->
                   <div class="card-move-actions" onclick="event.stopPropagation()">
                     <button class="btn-move" title="上へ移動" onclick="moveOmamori(${catIndex}, ${itemIdx}, -1, event)" ${isFirst ? 'disabled' : ''}>⬆️</button>
                     <button class="btn-move" title="下へ移動" onclick="moveOmamori(${catIndex}, ${itemIdx}, 1, event)" ${isLast ? 'disabled' : ''}>⬇️</button>
@@ -566,7 +613,6 @@
               <span>📁 ${escapeHtml(catName)} (${items.length})</span>
             </div>
             <div class="category-actions">
-              <!-- ★ 大カテゴリの上下並べ替えボタン ★ -->
               <div class="card-move-actions" onclick="event.stopPropagation()">
                 <button class="btn-move" title="大カテゴリを上へ" onclick="moveCategory(${catIndex}, -1, event)" ${isFirstCat ? 'disabled' : ''}>⬆️</button>
                 <button class="btn-move" title="大カテゴリを下へ" onclick="moveCategory(${catIndex}, 1, event)" ${isLastCat ? 'disabled' : ''}>⬇️</button>
@@ -596,31 +642,21 @@
       }
     }
 
-    // ★ 大カテゴリを上下に移動する処理 ★
     function moveCategory(catIndex, direction, event) {
       event.stopPropagation();
       const targetIndex = catIndex + direction;
-
       if (targetIndex < 0 || targetIndex >= categoriesData.length) return;
 
-      // 配列の要素を入れ替え
       const temp = categoriesData[catIndex];
       categoriesData[catIndex] = categoriesData[targetIndex];
       categoriesData[targetIndex] = temp;
 
-      saveData();
-      renderGroupedCards();
-
-      // 移動後もその大カテゴリを開いた状態にする
-      const groupEl = document.getElementById(`catGroup_${targetIndex}`);
-      if (groupEl) groupEl.classList.add('open');
+      saveAllAndRefresh(targetIndex);
     }
 
-    // ★ 中カテゴリ（カード）を上下に移動する処理 ★
     function moveOmamori(catIndex, itemIdx, direction, event) {
       event.stopPropagation();
       const catName = categoriesData[catIndex];
-      
       const categoryItems = omamoriData.filter(item => item.category === catName);
       
       const targetIdx = itemIdx + direction;
@@ -637,11 +673,7 @@
         omamoriData[mainIndex1] = omamoriData[mainIndex2];
         omamoriData[mainIndex2] = temp;
 
-        saveData();
-        renderGroupedCards();
-
-        const groupEl = document.getElementById(`catGroup_${catIndex}`);
-        if (groupEl) groupEl.classList.add('open');
+        saveAllAndRefreshForCat(catIndex);
       }
     }
 
@@ -685,8 +717,9 @@
       };
 
       omamoriData.unshift(newItem);
-      saveData();
-      renderGroupedCards();
+      
+      saveAllAndRefresh();
+      saveDataToGas(); // スプシへ同期
 
       document.getElementById('categoryInput').value = "";
       document.getElementById('titleInput').value = "";
@@ -706,8 +739,8 @@
       event.stopPropagation();
       if (confirm("このおまもりを削除してもよろしいですか？")) {
         omamoriData = omamoriData.filter(item => item.id !== id);
-        saveData();
-        renderGroupedCards();
+        saveAllAndRefresh();
+        saveDataToGas();
       }
     }
 
@@ -719,9 +752,25 @@
       if (confirm(`大カテゴリ「${catName}」と、その中身をすべて削除してもよろしいですか？`)) {
         categoriesData.splice(catIndex, 1);
         omamoriData = omamoriData.filter(item => item.category !== catName);
-        saveData();
-        renderGroupedCards();
+        saveAllAndRefresh();
+        saveDataToGas();
       }
+    }
+
+    function saveAllAndRefresh(openCatIdx = null) {
+      renderGroupedCards();
+      saveDataToGas();
+      if (openCatIdx !== null) {
+        const groupEl = document.getElementById(`catGroup_${openCatIdx}`);
+        if (groupEl) groupEl.classList.add('open');
+      }
+    }
+
+    function saveAllAndRefreshForCat(catIndex) {
+      renderGroupedCards();
+      saveDataToGas();
+      const groupEl = document.getElementById(`catGroup_${catIndex}`);
+      if (groupEl) groupEl.classList.add('open');
     }
 
     function escapeHtml(str) {
