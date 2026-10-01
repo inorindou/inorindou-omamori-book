@@ -372,7 +372,7 @@
 <body>
 
   <header>
-    <button class="btn-sync" onclick="loadDataFromGas()" id="syncBtn">🔄 同期する</button>
+    <button class="btn-sync" onclick="loadDataFromGas()" id="syncBtn">🔄 更新する</button>
     <button class="btn-settings" onclick="openSettings()">⚙️GAS設定</button>
   </header>
 
@@ -483,7 +483,7 @@
       
       if (newUrl !== null) {
         localStorage.setItem(STORAGE_KEY_GAS_URL, newUrl.trim());
-        alert("GAS設定を保存しました♪ 「🔄 同期する」ボタンからスプシのデータを読み込んでね！");
+        alert("GAS設定を保存しました♪ 「🔄 更新する」ボタンからスプシのデータを読み込んでね！");
         if (newUrl.trim() !== "") {
           loadDataFromGas();
         }
@@ -519,7 +519,7 @@
           alert("通信エラーが発生しました。URLやデプロイ設定を確認してね！");
         })
         .finally(() => {
-          syncBtn.textContent = "🔄 同期する";
+          syncBtn.textContent = "🔄 更新する";
         });
     }
 
